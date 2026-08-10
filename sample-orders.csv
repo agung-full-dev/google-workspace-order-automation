@@ -1,0 +1,5 @@
+ORDER ID,CUSTOMER,EVENT,CAKE TYPE,SIZE,DUE DATE,FULFILLMENT,TOTAL,BALANCE,STATUS,ADDRESS,NOTES,CALENDAR EVENT ID,LAST SYNCED
+CK-1048,Emma Wilson,Wedding,Vanilla Berry,3 tier,2026-06-18 14:00,Delivery,480,0,Confirmed,18 Garden Avenue,Ivory floral decoration,,
+CK-1049,Lucas Moore,Birthday,Chocolate,8 inch,2026-06-19 10:30,Pickup,95,45,In progress,,Write Happy Birthday Lucas,,
+CK-1050,Sophia Chin,Celebration,Red Velvet,24 pcs,2026-06-20 16:00,Delivery,120,0,Confirmed,42 Hill Street,Call 30 minutes before arrival,,
+CK-1051,Noah Brown,Anniversary,Lemon,10 inch,2026-06-21 12:00,Pickup,145,75,New,,Gold lettering,,

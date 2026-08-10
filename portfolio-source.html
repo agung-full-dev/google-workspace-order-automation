@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cake Order Management | Google Workspace Automation</title>
+  <style>
+    :root {
+      --ink: #241c18;
+      --muted: #6f625b;
+      --cream: #fbf7f1;
+      --paper: #fffdf9;
+      --peach: #e88f63;
+      --peach-dark: #b65f3b;
+      --peach-soft: #fae5d8;
+      --sage: #5f7f6a;
+      --sage-soft: #e6efe8;
+      --yellow: #f3c86a;
+      --line: rgba(36, 28, 24, .13);
+      --shadow: 0 18px 45px rgba(56, 35, 25, .10);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; color: var(--ink); background: #e8ddd3; font-family: Arial, Helvetica, sans-serif; }
+    .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .icon {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .slide {
+      position: relative;
+      width: 1000px;
+      height: 750px;
+      margin: 24px auto;
+      overflow: hidden;
+      padding: 46px 58px 42px;
+      background:
+        radial-gradient(circle at 96% 3%, rgba(232,143,99,.16), transparent 28%),
+        radial-gradient(circle at 0 100%, rgba(95,127,106,.10), transparent 25%),
+        var(--cream);
+      page-break-after: always;
+    }
+    .slide::after {
+      content: "";
+      position: absolute;
+      right: -125px;
+      bottom: -130px;
+      width: 245px;
+      height: 245px;
+      border: 1px solid rgba(182,95,59,.18);
+      border-radius: 50%;
+    }
+    .dark {
+      color: #fffaf4;
+      background:
+        radial-gradient(circle at 88% 16%, rgba(232,143,99,.23), transparent 30%),
+        linear-gradient(140deg, #231b17, #120f0d);
+    }
+    .topbar { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: var(--peach-dark); background: var(--peach-soft); }
+    .brand-mark .icon { width: 18px; height: 18px; }
+    .page { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .16em; }
+    .dark .page { color: #b8a69c; }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 15px;
+      color: var(--peach-dark);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+    .kicker::before { content: ""; width: 18px; height: 2px; border-radius: 99px; background: currentColor; }
+    .dark .kicker { color: #f1a47b; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 20px; font-size: 55px; line-height: 1; letter-spacing: -.052em; }
+    h2 { max-width: 700px; margin-bottom: 0; font-size: 42px; line-height: 1.05; letter-spacing: -.042em; }
+    h3 { margin-bottom: 6px; font-size: 16px; line-height: 1.2; }
+    p { line-height: 1.48; }
+    .lead { max-width: 480px; color: #cbbcb3; font-size: 17px; }
+    .header { position: relative; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; gap: 30px; margin-top: 35px; }
+    .header-note { width: 255px; color: var(--muted); font-size: 12px; text-align: right; }
+    .footer {
+      position: absolute;
+      z-index: 4;
+      left: 58px;
+      right: 58px;
+      bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .dark .footer { border-color: rgba(255,255,255,.14); color: #a9988f; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.20); border-radius: 999px; color: #eee2da; font-size: 10px; font-weight: 800; }
+    .pill .icon { width: 13px; height: 13px; color: #f2a278; }
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      color: var(--peach-dark);
+      background: var(--peach-soft);
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .label::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--peach); }
+    .hero-copy { position: relative; z-index: 3; width: 445px; margin-top: 105px; }
+    .hero-copy h1 span { color: #f2a278; }
+    .hero-visual { position: absolute; z-index: 2; top: 142px; right: 50px; width: 425px; height: 450px; }
+    .sheet-window, .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .sheet-window { position: relative; width: 100%; height: 286px; transform: rotate(1.2deg); }
+    .window-head { display: flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px; border-bottom: 1px solid var(--line); background: #f4f7f3; }
+    .window-logo { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 6px; color: white; background: #20a464; }
+    .window-logo .icon { width: 13px; height: 13px; }
+    .window-title { flex: 1; font-size: 10px; font-weight: 800; }
+    .window-chip { padding: 5px 8px; border-radius: 999px; color: #287248; background: #dff2e5; font-size: 7px; font-weight: 900; }
+    .sheet-toolbar { height: 24px; border-bottom: 1px solid #e4e8e5; background: #f8faf9; }
+    .sheet-grid { padding: 12px; }
+    .sheet-row { display: grid; grid-template-columns: .75fr 1.3fr 1fr 1fr .8fr; min-height: 31px; border-bottom: 1px solid #e6e2de; }
+    .sheet-row span { display: flex; align-items: center; padding: 6px; border-right: 1px solid #ece8e4; color: #695d56; font-size: 7px; }
+    .sheet-row span:last-child { border-right: 0; }
+    .sheet-row.head span { color: #7d6d64; background: #f4ece6; font-size: 6px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+    .status { display: inline-flex !important; justify-content: center; align-self: center; min-height: 18px; margin: 4px; padding: 3px 6px !important; border: 0 !important; border-radius: 999px; color: #2d6c46 !important; background: #dff0e4; font-weight: 900; }
+    .status.wait { color: #9a5b2e !important; background: #f9e6cf; }
+    .hero-sync {
+      position: absolute;
+      z-index: 4;
+      left: -22px;
+      bottom: 18px;
+      width: 190px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 16px;
+      color: white;
+      background: linear-gradient(145deg, #64402e, #a65b3a);
+      box-shadow: 0 18px 36px rgba(25,15,10,.28);
+    }
+    .hero-sync small { color: #f8c7ac; font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .hero-sync h3 { margin: 9px 0 5px; font-size: 17px; }
+    .hero-sync p { margin: 0; color: #f2dcd0; font-size: 9px; }
+    .hero-calendar {
+      position: absolute;
+      z-index: 3;
+      right: 0;
+      bottom: 0;
+      width: 245px;
+      height: 190px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+    .cal-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; font-size: 9px; font-weight: 900; }
+    .cal-title span { color: var(--peach-dark); }
+    .mini-week { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; }
+    .mini-day { color: #91837a; font-size: 6px; text-align: center; }
+    .mini-day b { display: block; margin-top: 4px; color: var(--ink); font-size: 9px; }
+    .mini-event { margin-top: 10px; padding: 8px; border-left: 3px solid var(--peach); border-radius: 7px; color: #754229; background: var(--peach-soft); font-size: 7px; font-weight: 800; }
+
+    .tracker-layout, .dashboard-layout, .calendar-layout { position: relative; z-index: 2; display: grid; gap: 18px; margin-top: 31px; }
+    .tracker-layout { grid-template-columns: 2.25fr .75fr; }
+    .tracker-panel { height: 388px; }
+    .tracker-panel .sheet-row { grid-template-columns: .75fr 1.35fr 1fr 1fr .8fr .9fr; }
+    .tracker-panel .sheet-grid { padding: 10px 12px; }
+    .tracker-panel .sheet-row span { font-size: 7.2px; }
+    .feature-stack { display: grid; gap: 10px; }
+    .feature-card { min-height: 91px; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.82); box-shadow: 0 10px 24px rgba(56,35,25,.045); }
+    .feature-card .icon-box, .icon-box { display: grid; place-items: center; width: 32px; height: 32px; margin-bottom: 10px; border-radius: 10px; color: var(--peach-dark); background: var(--peach-soft); }
+    .icon-box .icon { width: 17px; height: 17px; }
+    .feature-card h3 { font-size: 13px; }
+    .feature-card p { margin: 0; color: var(--muted); font-size: 9px; }
+    .demo-note { position: absolute; right: 14px; top: 12px; padding: 5px 8px; border-radius: 999px; color: #816f65; background: #f1ece8; font-size: 7px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+
+    .dashboard-layout { grid-template-columns: 1.45fr .55fr; }
+    .dashboard { position: relative; height: 398px; padding: 20px; }
+    .dash-head { display: flex; align-items: end; justify-content: space-between; margin-bottom: 15px; }
+    .dash-head h3 { margin: 0; font-size: 20px; }
+    .dash-head small { color: var(--muted); font-size: 8px; }
+    .metrics { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+    .metric { min-height: 75px; padding: 12px; border: 1px solid #e6e0db; border-radius: 12px; background: #fff; }
+    .metric small { color: #8b7c73; font-size: 6px; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; }
+    .metric strong { display: block; margin-top: 7px; font-size: 20px; }
+    .metric em { display: block; margin-top: 5px; color: var(--sage); font-size: 6px; font-style: normal; font-weight: 800; }
+    .dash-lower { display: grid; grid-template-columns: 1.35fr .65fr; gap: 10px; margin-top: 11px; }
+    .chart-card, .next-card { min-height: 222px; padding: 14px; border: 1px solid #e6e0db; border-radius: 13px; background: #fff; }
+    .card-title { display: flex; justify-content: space-between; color: #776a62; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+    .bars { display: flex; align-items: end; gap: 10px; height: 150px; padding: 17px 5px 0; border-bottom: 1px solid #e9e4e0; }
+    .bar { flex: 1; min-height: 25px; border-radius: 7px 7px 0 0; background: linear-gradient(#f2b18d, #d77c52); }
+    .bar:nth-child(1) { height: 40%; }
+    .bar:nth-child(2) { height: 66%; }
+    .bar:nth-child(3) { height: 52%; }
+    .bar:nth-child(4) { height: 82%; }
+    .bar:nth-child(5) { height: 61%; }
+    .order-line { display: grid; grid-template-columns: 8px 1fr auto; gap: 7px; align-items: center; padding: 11px 0; border-bottom: 1px solid #ece7e3; }
+    .order-line i { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); }
+    .order-line b { display: block; font-size: 7px; }
+    .order-line small { color: var(--muted); font-size: 6px; }
+    .order-line span { padding: 4px 6px; border-radius: 99px; color: #39704b; background: var(--sage-soft); font-size: 6px; font-weight: 800; }
+    .decision-stack { display: grid; gap: 12px; align-content: start; }
+    .decision-card { padding: 17px; border-left: 3px solid var(--peach); border-radius: 0 14px 14px 0; background: #fff; box-shadow: 0 10px 24px rgba(56,35,25,.05); }
+    .decision-card h3 { font-size: 13px; }
+    .decision-card p { margin: 0; color: var(--muted); font-size: 9px; }
+
+    .calendar-layout { grid-template-columns: 1.55fr .65fr; }
+    .calendar-panel { position: relative; height: 394px; padding: 19px; }
+    .calendar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .calendar-head h3 { margin: 0; font-size: 16px; }
+    .calendar-head span { color: var(--muted); font-size: 8px; }
+    .week-grid { display: grid; grid-template-columns: 45px repeat(5,1fr); height: 308px; border-top: 1px solid #e5e0dc; border-left: 1px solid #e5e0dc; }
+    .week-grid > div { position: relative; border-right: 1px solid #e5e0dc; border-bottom: 1px solid #e5e0dc; }
+    .time { padding: 10px 5px; color: #998b82; font-size: 6px; text-align: right; }
+    .day-head { padding: 8px; color: #887970; font-size: 6px; font-weight: 800; text-align: center; }
+    .day-head b { display: block; margin-top: 3px; color: var(--ink); font-size: 10px; }
+    .event {
+      position: absolute;
+      left: 5px;
+      right: 5px;
+      padding: 6px;
+      border-left: 3px solid var(--peach);
+      border-radius: 7px;
+      color: #71432f;
+      background: var(--peach-soft);
+      font-size: 6px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+    .event.sage { border-color: var(--sage); color: #385945; background: var(--sage-soft); }
+    .event.one { top: 30px; }
+    .event.two { top: 18px; }
+    .event.three { top: 28px; }
+    .sync-detail { height: 394px; padding: 22px; color: #fffaf4; background: linear-gradient(145deg, #33251e, #211916); }
+    .sync-detail .label { color: #ffd4bc; background: rgba(232,143,99,.14); }
+    .sync-detail h3 { margin: 22px 0 17px; font-size: 22px; }
+    .detail-line { display: grid; grid-template-columns: 25px 1fr; gap: 9px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+    .detail-line .icon { width: 15px; height: 15px; color: #f1a47b; }
+    .detail-line b { display: block; margin-bottom: 4px; font-size: 9px; }
+    .detail-line span { color: #cdbdb4; font-size: 8px; line-height: 1.4; }
+
+    .workflow { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-top: 35px; }
+    .step { position: relative; min-height: 190px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.85); box-shadow: 0 10px 24px rgba(56,35,25,.04); }
+    .step:not(:last-child)::after { content: "→"; position: absolute; z-index: 3; right: -14px; top: 85px; color: var(--peach-dark); font-weight: 900; }
+    .step-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+    .step-num { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; color: white; background: var(--peach-dark); font-size: 8px; font-weight: 900; }
+    .step .icon-box { width: 32px; height: 32px; margin: 0; }
+    .step h3 { font-size: 13px; }
+    .step p { margin: 0; color: var(--muted); font-size: 9px; }
+    .guards { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 13px; }
+    .guard { min-height: 101px; padding: 14px; border-radius: 14px; color: #f7eee8; background: #2b211c; }
+    .guard b { display: block; margin-bottom: 7px; color: #f4aa81; font-size: 10px; }
+    .guard p { margin: 0; color: #cbbcb3; font-size: 8px; }
+
+    .architecture { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 34px 1.08fr 34px 1fr; margin-top: 32px; }
+    .arch-card { min-height: 247px; padding: 20px; border: 1px solid var(--line); border-radius: 17px; background: rgba(255,255,255,.88); box-shadow: 0 12px 28px rgba(56,35,25,.05); }
+    .arch-card.core { color: white; background: linear-gradient(145deg, #70422e, #a85e3c); border: 0; }
+    .arch-card .icon-box { width: 38px; height: 38px; }
+    .arch-card.core .icon-box { color: #ffd3ba; background: rgba(255,255,255,.12); }
+    .arch-card small { color: var(--peach-dark); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .arch-card.core small { color: #ffd3ba; }
+    .arch-card h3 { margin: 13px 0 11px; font-size: 18px; }
+    .arch-card ul { margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: 9px; line-height: 1.75; }
+    .arch-card.core ul { color: #fae8df; }
+    .arch-card li::before { content: "✓"; margin-right: 7px; color: var(--sage); font-weight: 900; }
+    .arch-card.core li::before { color: #ffd3ba; }
+    .arrow { display: grid; place-items: center; color: var(--peach-dark); font-weight: 900; }
+    .handoff { position: relative; z-index: 2; display: grid; grid-template-columns: .7fr 1.3fr; gap: 14px; margin-top: 15px; }
+    .proof, .deliverables { min-height: 115px; padding: 16px 18px; border-radius: 15px; }
+    .proof { color: #eee7e2; background: #211a17; font-family: monospace; font-size: 8px; line-height: 1.65; }
+    .proof b { display: block; margin-bottom: 6px; color: #f0a47b; font-family: Arial, sans-serif; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+    .proof code span { color: #83bc96; }
+    .deliverables { border: 1px solid rgba(95,127,106,.22); background: var(--sage-soft); }
+    .deliverables h3 { margin-bottom: 11px; color: #3c6349; font-size: 12px; }
+    .deliverable-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .deliverable-row span { padding: 7px 9px; border: 1px solid rgba(95,127,106,.20); border-radius: 999px; color: #466750; background: rgba(255,255,255,.66); font-size: 8px; font-weight: 800; }
+
+    /* Minimal graphite portfolio theme */
+    html, body { background: #171716; }
+    .slide,
+    .dark {
+      color: #f4f2ed;
+      background:
+        radial-gradient(circle at 92% 12%, rgba(255,255,255,.055), transparent 28%),
+        radial-gradient(circle at 8% 92%, rgba(255,255,255,.025), transparent 24%),
+        linear-gradient(135deg, #292928, #1c1c1b 58%, #151514);
+    }
+    .slide::after { display: none; }
+    .topbar {
+      padding-bottom: 13px;
+      border-bottom: 1px solid rgba(255,255,255,.32);
+    }
+    .brand { color: #f2f0eb; font-size: 11px; font-weight: 500; letter-spacing: .09em; }
+    .brand-mark { display: none; }
+    .page { color: #b8b6b1; font-size: 10px; font-weight: 500; }
+    .header { margin-top: 29px; }
+    .kicker { color: #c7c5c0; font-weight: 600; letter-spacing: .15em; }
+    .dark .kicker { color: #c7c5c0; }
+    h2 { color: #f3f1ec; font-weight: 400; letter-spacing: -.035em; }
+    .header-note { color: #b8b6b1; font-size: 11px; }
+    .footer,
+    .dark .footer {
+      border-color: rgba(255,255,255,.28);
+      color: #b8b6b1;
+      font-weight: 500;
+    }
+    .footer strong { color: #d9d7d2; font-weight: 500; }
+
+    .hero-copy { width: 450px; margin-top: 112px; }
+    .hero-copy h1 {
+      margin-bottom: 25px;
+      color: #f3f1ec;
+      font-size: 45px;
+      font-weight: 400;
+      line-height: 1.16;
+      letter-spacing: -.025em;
+      text-transform: uppercase;
+    }
+    .hero-copy h1 span { color: #f3f1ec; }
+    .lead { max-width: 430px; color: #d1cfca; font-size: 15px; }
+    .pill-row { margin-top: 25px; }
+    .pill {
+      border-color: rgba(255,255,255,.22);
+      color: #e4e2dd;
+      background: rgba(255,255,255,.05);
+      font-weight: 500;
+    }
+    .pill:nth-child(1) .icon { color: #34a853; }
+    .pill:nth-child(2) .icon { color: #fbbc04; }
+    .pill:nth-child(3) .icon { color: #4285f4; }
+    .hero-visual { top: 137px; right: 47px; width: 430px; height: 455px; }
+    .sheet-window {
+      height: 293px;
+      border: 1px solid rgba(0,0,0,.2);
+      border-radius: 3px;
+      box-shadow: 0 28px 55px rgba(0,0,0,.32);
+      transform: rotate(-4deg);
+    }
+    .window-head { height: 39px; background: #f8f8f6; }
+    .window-title { color: #262625; font-weight: 700; }
+    .window-chip { color: #5e5d59; background: #ecebe7; }
+    .sheet-toolbar { background: #f3f4f2; }
+    .hero-sync {
+      left: -12px;
+      bottom: 11px;
+      width: 174px;
+      border-color: rgba(255,255,255,.24);
+      border-radius: 10px;
+      background: rgba(39,39,38,.96);
+      box-shadow: 0 20px 42px rgba(0,0,0,.34);
+    }
+    .hero-sync small { color: #9cd5ae; }
+    .hero-sync h3 { font-size: 15px; }
+    .hero-sync p { color: #c8c6c1; }
+    .hero-calendar {
+      right: -2px;
+      bottom: -2px;
+      width: 190px;
+      height: 329px;
+      padding: 31px 12px 20px;
+      border: 8px solid #111;
+      border-radius: 31px;
+      box-shadow: 0 28px 55px rgba(0,0,0,.42);
+      transform: rotate(6deg);
+    }
+    .hero-calendar::before {
+      content: "";
+      position: absolute;
+      top: 7px;
+      left: 50%;
+      width: 62px;
+      height: 15px;
+      border-radius: 99px;
+      background: #111;
+      transform: translateX(-50%);
+    }
+    .hero-calendar::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      width: 58px;
+      height: 3px;
+      border-radius: 99px;
+      background: #171717;
+      transform: translateX(-50%);
+    }
+    .hero-calendar .cal-title { color: #242423; }
+    .hero-calendar .cal-title span { color: #4285f4; }
+    .hero-calendar .mini-day b { color: #222; }
+    .mini-event { border-color: #4285f4; color: #353535; background: #ecece9; }
+    .label { color: #dfddd8; background: rgba(255,255,255,.09); }
+    .label::before { background: #34a853; }
+
+    .panel,
+    .tracker-panel,
+    .calendar-panel {
+      border-color: rgba(255,255,255,.16);
+      border-radius: 5px;
+      background: #f4f2ed;
+      box-shadow: 0 18px 42px rgba(0,0,0,.22);
+    }
+    .tracker-panel { height: 388px; transform: none; }
+    .feature-card,
+    .decision-card {
+      border: 1px solid rgba(255,255,255,.19);
+      border-radius: 5px;
+      color: #f4f2ed;
+      background: rgba(255,255,255,.045);
+      box-shadow: none;
+    }
+    .feature-card p,
+    .decision-card p { color: #bdbbb6; }
+    .feature-card .icon-box,
+    .icon-box {
+      color: #eceae5;
+      background: rgba(255,255,255,.10);
+    }
+    .feature-card:first-child .icon-box { color: #34a853; }
+    .feature-card:nth-child(2) .icon-box { color: #4285f4; }
+    .feature-card:nth-child(3) .icon-box { color: #fbbc04; }
+    .demo-note { color: #5b5a57; background: #e9e8e4; }
+
+    .dashboard { color: #242423; }
+    .dashboard .metric,
+    .dashboard .chart-card,
+    .dashboard .next-card { border-color: #d2d1cd; border-radius: 4px; }
+    .bars .bar { border-radius: 2px 2px 0 0; background: linear-gradient(#8d8c88, #444442); }
+    .order-line span { color: #2d6c46; background: #e0eee4; }
+    .decision-card { border-left: 2px solid #8e8d89; }
+    .calendar-panel { color: #242423; }
+    .sync-detail {
+      border: 1px solid rgba(255,255,255,.20);
+      border-radius: 5px;
+      background: rgba(0,0,0,.25);
+      box-shadow: none;
+    }
+    .sync-detail .label { color: #dcdad5; background: rgba(255,255,255,.09); }
+    .sync-detail .detail-line .icon { color: #4285f4; }
+    .event { border-color: #4285f4; color: #30302f; background: #e8e8e5; }
+    .event.sage { border-color: #34a853; color: #304d38; background: #e5eee7; }
+
+    .step {
+      border-color: rgba(255,255,255,.18);
+      border-radius: 5px;
+      color: #222;
+      background: #f3f1ec;
+      box-shadow: 0 14px 32px rgba(0,0,0,.16);
+    }
+    .step-num { color: #fff; background: #3b3b39; }
+    .step .icon-box { color: #343432; background: #deddd8; }
+    .step p { color: #696864; }
+    .step:not(:last-child)::after { color: #b8b6b1; }
+    .guard {
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 5px;
+      color: #f4f2ed;
+      background: rgba(255,255,255,.045);
+    }
+    .guard b { color: #e7e5e0; }
+    .guard p { color: #b9b7b2; }
+
+    .arch-card {
+      border-color: rgba(255,255,255,.18);
+      border-radius: 5px;
+      color: #242423;
+      background: #f3f1ec;
+      box-shadow: 0 14px 34px rgba(0,0,0,.18);
+    }
+    .arch-card.core {
+      border: 1px solid rgba(255,255,255,.22);
+      color: #f3f1ec;
+      background: #323230;
+    }
+    .arch-card small { color: #676662; }
+    .arch-card.core small { color: #c9c7c2; }
+    .arch-card .icon-box { color: #34a853; background: #e2e1dc; }
+    .arch-card.core .icon-box { color: #fbbc04; background: rgba(255,255,255,.10); }
+    .arch-card:last-child .icon-box { color: #4285f4; }
+    .arch-card.core ul { color: #d4d2cd; }
+    .arch-card li::before { color: #34a853; }
+    .arch-card.core li::before { color: #fbbc04; }
+    .arrow { color: #b8b6b1; }
+    .proof { border: 1px solid rgba(255,255,255,.18); border-radius: 5px; color: #e6e4df; background: rgba(0,0,0,.30); }
+    .proof b { color: #b9b7b2; }
+    .proof code span { color: #7ec692; }
+    .deliverables {
+      border-color: rgba(255,255,255,.18);
+      border-radius: 5px;
+      background: rgba(255,255,255,.06);
+    }
+    .deliverables h3 { color: #f0eee9; }
+    .deliverable-row span { border-color: rgba(255,255,255,.18); color: #d9d7d2; background: rgba(255,255,255,.06); }
+    @media print {
+      @page { size: 10in 7.5in; margin: 0; }
+      html, body { background: white; }
+      .slide { margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-cake" viewBox="0 0 24 24"><path d="M4 10h16v10H4zM7 10V7h10v3M10 7V4h4v3M3 20h18"/><path d="M4 14c2 2 4-2 6 0s4-2 6 0 4-2 4-2"/></symbol>
+    <symbol id="i-sheet" viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5zM15 3v5h4M8 12h8M8 16h8M11 9v10"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h3M14 14h3M7 18h3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></symbol>
+    <symbol id="i-money" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 12h.01M17 12h.01M9 12a3 3 0 0 0 6 0 3 3 0 0 0-6 0Z"/></symbol>
+    <symbol id="i-status" viewBox="0 0 24 24"><path d="M4 7h10M4 12h16M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m12 3 10 18H2zM12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-location" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 8h8M8 12h8M8 16h5"/></symbol>
+    <symbol id="i-input" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8M8 12h5M8 16h8"/></symbol>
+    <symbol id="i-validate" viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 7h6M9 11l2 2 4-4M9 17h6"/></symbol>
+    <symbol id="i-trigger" viewBox="0 0 24 24"><path d="m13 2-8 12h7l-1 8 8-12h-7z"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M18.5 9A8 8 0 0 0 5 7l-1 1M5.5 15A8 8 0 0 0 19 17l1-1"/></symbol>
+    <symbol id="i-log" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></symbol>
+  </svg>
+
+  <section class="slide dark">
+    <div class="topbar">
+      <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div>
+      <span class="page">01 / 06</span>
+    </div>
+    <div class="hero-copy">
+      <p class="kicker">Google Workspace automation</p>
+      <h1>Cake orders, clear from request to <span>delivery.</span></h1>
+      <p class="lead">A working prototype that keeps order details in Google Sheets and adds confirmed pickup or delivery times to Google Calendar.</p>
+      <div class="pill-row">
+        <span class="pill"><svg class="icon"><use href="#i-sheet"/></svg>Google Sheets</span>
+        <span class="pill"><svg class="icon"><use href="#i-code"/></svg>Apps Script</span>
+        <span class="pill"><svg class="icon"><use href="#i-calendar"/></svg>Google Calendar</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="sheet-window">
+        <div class="window-head"><span class="window-logo"><svg class="icon"><use href="#i-sheet"/></svg></span><span class="window-title">Cake Order Management</span><span class="window-chip">Working prototype</span></div>
+        <div class="sheet-toolbar"></div>
+        <div class="sheet-grid">
+          <div class="sheet-row head"><span>Order</span><span>Cake</span><span>Due</span><span>Type</span><span>Status</span></div>
+          <div class="sheet-row"><span>CK-1048</span><span>Vanilla berry</span><span>18 Jun</span><span>Delivery</span><span class="status">Confirmed</span></div>
+          <div class="sheet-row"><span>CK-1049</span><span>Chocolate</span><span>19 Jun</span><span>Pickup</span><span class="status wait">In progress</span></div>
+          <div class="sheet-row"><span>CK-1050</span><span>Red velvet</span><span>20 Jun</span><span>Delivery</span><span class="status">Ready</span></div>
+          <div class="sheet-row"><span>CK-1051</span><span>Lemon</span><span>21 Jun</span><span>Pickup</span><span class="status wait">New</span></div>
+        </div>
+        <span class="demo-note">Fictional demo data</span>
+      </div>
+      <div class="hero-sync"><small>Automation status</small><h3>Calendar sync active</h3><p>Confirmed orders create or update one linked event.</p></div>
+      <div class="hero-calendar">
+        <div class="cal-title">June 2026 <span>Week view</span></div>
+        <div class="mini-week">
+          <div class="mini-day">MON<b>16</b></div><div class="mini-day">TUE<b>17</b></div><div class="mini-day">WED<b>18</b></div><div class="mini-day">THU<b>19</b></div><div class="mini-day">FRI<b>20</b></div>
+        </div>
+        <div class="mini-event">2:00 PM · Delivery · CK-1048</div>
+        <div class="mini-event" style="border-color:var(--sage);background:var(--sage-soft);color:#385945">10:30 AM · Pickup · CK-1049</div>
+      </div>
+    </div>
+    <div class="footer"><span>Self-initiated working prototype</span><strong>Workflow design · Apps Script · QA</strong></div>
+  </section>
+
+  <section class="slide">
+    <div class="topbar"><div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div><span class="page">02 / 06</span></div>
+    <div class="header"><div><p class="kicker">Master order tracker</p><h2>Every order starts in one clear tracker.</h2></div><p class="header-note">The team can update orders without learning a new tool. Required fields keep the data ready for automation.</p></div>
+    <div class="tracker-layout">
+      <div class="sheet-window tracker-panel">
+        <div class="window-head"><span class="window-logo"><svg class="icon"><use href="#i-sheet"/></svg></span><span class="window-title">All Orders</span><span class="window-chip">Last saved</span></div>
+        <div class="sheet-toolbar"></div>
+        <div class="sheet-grid">
+          <div class="sheet-row head"><span>Order</span><span>Cake details</span><span>Due</span><span>Fulfillment</span><span>Balance</span><span>Status</span></div>
+          <div class="sheet-row"><span>CK-1048</span><span>Vanilla berry · 3 tier</span><span>18 Jun · 2 PM</span><span>Delivery</span><span>Paid</span><span class="status">Confirmed</span></div>
+          <div class="sheet-row"><span>CK-1049</span><span>Chocolate · 8 inch</span><span>19 Jun · 10:30</span><span>Pickup</span><span>$45</span><span class="status wait">In progress</span></div>
+          <div class="sheet-row"><span>CK-1050</span><span>Red velvet · 24 pcs</span><span>20 Jun · 4 PM</span><span>Delivery</span><span>Paid</span><span class="status">Ready</span></div>
+          <div class="sheet-row"><span>CK-1051</span><span>Lemon · 10 inch</span><span>21 Jun · 12 PM</span><span>Pickup</span><span>$75</span><span class="status wait">New</span></div>
+          <div class="sheet-row"><span>CK-1052</span><span>Carrot · 2 tier</span><span>22 Jun · 1:30</span><span>Delivery</span><span>$130</span><span class="status wait">In progress</span></div>
+        </div>
+        <span class="demo-note">Fictional demo data</span>
+      </div>
+      <div class="feature-stack">
+        <article class="feature-card"><span class="icon-box"><svg class="icon"><use href="#i-check"/></svg></span><h3>Required fields</h3><p>Order ID, date, delivery type, and status are checked before sync.</p></article>
+        <article class="feature-card"><span class="icon-box"><svg class="icon"><use href="#i-filter"/></svg></span><h3>Clear status</h3><p>New, in progress, confirmed, and ready orders are easy to scan.</p></article>
+        <article class="feature-card"><span class="icon-box"><svg class="icon"><use href="#i-money"/></svg></span><h3>Payment view</h3><p>Total and remaining balance stay next to the order details.</p></article>
+      </div>
+    </div>
+    <div class="footer"><span>Google Sheets order operations</span><strong>Simple input · clear status · useful data</strong></div>
+  </section>
+
+  <section class="slide">
+    <div class="topbar"><div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div><span class="page">03 / 06</span></div>
+    <div class="header"><div><p class="kicker">Daily dashboard</p><h2>See what needs attention today.</h2></div><p class="header-note">A simple dashboard turns order rows into a useful view for planning the week.</p></div>
+    <div class="dashboard-layout">
+      <div class="panel dashboard">
+        <div class="dash-head"><h3>Good morning, Bakery Team</h3><small>Week of 16–22 June</small></div>
+        <div class="metrics">
+          <div class="metric"><small>Active orders</small><strong>6</strong><em>Demo data</em></div>
+          <div class="metric"><small>Due this week</small><strong>3</strong><em>2 confirmed</em></div>
+          <div class="metric"><small>Booked total</small><strong>$1.1k</strong><em>Example only</em></div>
+          <div class="metric"><small>Open balance</small><strong>$250</strong><em>3 orders</em></div>
+        </div>
+        <div class="dash-lower">
+          <div class="chart-card"><div class="card-title"><span>Orders by day</span><b>6 total</b></div><div class="bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div></div>
+          <div class="next-card"><div class="card-title"><span>Up next</span><b>View all</b></div>
+            <div class="order-line"><i></i><div><b>CK-1048</b><small>Wedding · 2 PM</small></div><span>Confirmed</span></div>
+            <div class="order-line"><i style="background:var(--peach)"></i><div><b>CK-1049</b><small>Birthday · 10:30</small></div><span>Making</span></div>
+            <div class="order-line"><i></i><div><b>CK-1050</b><small>Celebration · 4 PM</small></div><span>Ready</span></div>
+          </div>
+        </div>
+        <span class="demo-note">Fictional demo data</span>
+      </div>
+      <div class="decision-stack">
+        <article class="decision-card"><h3>Know what is due</h3><p>Upcoming pickup and delivery times stay visible.</p></article>
+        <article class="decision-card"><h3>Spot open balances</h3><p>The team can follow up before handoff.</p></article>
+        <article class="decision-card"><h3>Plan production</h3><p>Current status shows what needs work next.</p></article>
+      </div>
+    </div>
+    <div class="footer"><span>Prototype dashboard using sample data</span><strong>Plan the week from one view</strong></div>
+  </section>
+
+  <section class="slide">
+    <div class="topbar"><div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div><span class="page">04 / 06</span></div>
+    <div class="header"><div><p class="kicker">Calendar automation</p><h2>Confirm an order. Get a scheduled event.</h2></div><p class="header-note">Apps Script creates a new calendar event or updates the existing linked event.</p></div>
+    <div class="calendar-layout">
+      <div class="panel calendar-panel">
+        <div class="calendar-head"><h3>June 2026</h3><span>Working week · demo data</span></div>
+        <div class="week-grid">
+          <div></div><div class="day-head">MON<b>16</b></div><div class="day-head">TUE<b>17</b></div><div class="day-head">WED<b>18</b></div><div class="day-head">THU<b>19</b></div><div class="day-head">FRI<b>20</b></div>
+          <div class="time">9 AM</div><div></div><div><span class="event one">Prep · CK-1048</span></div><div></div><div><span class="event sage two">Pickup · CK-1049</span></div><div></div>
+          <div class="time">12 PM</div><div></div><div></div><div><span class="event three">Delivery · CK-1048</span></div><div></div><div></div>
+          <div class="time">3 PM</div><div></div><div></div><div></div><div></div><div><span class="event sage two">Delivery · CK-1050</span></div>
+        </div>
+      </div>
+      <div class="panel sync-detail">
+        <span class="label">Auto-created</span>
+        <h3>Delivery · CK-1048</h3>
+        <div class="detail-line"><svg class="icon"><use href="#i-clock"/></svg><div><b>Wednesday, 18 June</b><span>2:00 PM delivery</span></div></div>
+        <div class="detail-line"><svg class="icon"><use href="#i-cake"/></svg><div><b>Vanilla berry · 3 tier</b><span>Order details from the sheet</span></div></div>
+        <div class="detail-line"><svg class="icon"><use href="#i-location"/></svg><div><b>Delivery location</b><span>Address is included when available</span></div></div>
+        <div class="detail-line"><svg class="icon"><use href="#i-sync"/></svg><div><b>Linked to one order row</b><span>Stored event ID supports later updates</span></div></div>
+      </div>
+    </div>
+    <div class="footer"><span>Google Calendar synchronization</span><strong>Create once · update safely · keep a record</strong></div>
+  </section>
+
+  <section class="slide">
+    <div class="topbar"><div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div><span class="page">05 / 06</span></div>
+    <div class="header"><div><p class="kicker">Automation workflow</p><h2>The script handles the repetitive steps.</h2></div><p class="header-note">The workflow is short enough to understand and careful enough to avoid duplicate events.</p></div>
+    <div class="workflow">
+      <article class="step"><div class="step-head"><span class="step-num">01</span><span class="icon-box"><svg class="icon"><use href="#i-input"/></svg></span></div><h3>Order entered</h3><p>The team adds cake, payment, and schedule details.</p></article>
+      <article class="step"><div class="step-head"><span class="step-num">02</span><span class="icon-box"><svg class="icon"><use href="#i-validate"/></svg></span></div><h3>Data checked</h3><p>Required fields and the due date are validated.</p></article>
+      <article class="step"><div class="step-head"><span class="step-num">03</span><span class="icon-box"><svg class="icon"><use href="#i-trigger"/></svg></span></div><h3>Status confirmed</h3><p>Only confirmed orders are ready for calendar sync.</p></article>
+      <article class="step"><div class="step-head"><span class="step-num">04</span><span class="icon-box"><svg class="icon"><use href="#i-sync"/></svg></span></div><h3>Event synced</h3><p>The script creates or updates the linked event.</p></article>
+      <article class="step"><div class="step-head"><span class="step-num">05</span><span class="icon-box"><svg class="icon"><use href="#i-log"/></svg></span></div><h3>Result logged</h3><p>The order ID, result, and details are saved.</p></article>
+    </div>
+    <div class="guards">
+      <article class="guard"><b>Required-field checks</b><p>Incomplete orders stop before a bad event is created.</p></article>
+      <article class="guard"><b>Duplicate prevention</b><p>A saved event ID keeps later changes on the same event.</p></article>
+      <article class="guard"><b>Clear sync log</b><p>Created, updated, and skipped results are recorded.</p></article>
+      <article class="guard"><b>Easy configuration</b><p>Sheet names, calendar, and headers are kept in one config.</p></article>
+    </div>
+    <div class="footer"><span>Apps Script workflow</span><strong>Validate · sync · update · log</strong></div>
+  </section>
+
+  <section class="slide">
+    <div class="topbar"><div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-cake"/></svg></span>Google Workspace Automation Project — Cake Orders</div><span class="page">06 / 06</span></div>
+    <div class="header"><div><p class="kicker">Working prototype</p><h2>Simple tools, connected for daily work.</h2></div><p class="header-note">The solution stays inside Google Workspace and can be adjusted to match a real bakery process.</p></div>
+    <div class="architecture">
+      <article class="arch-card"><span class="icon-box"><svg class="icon"><use href="#i-sheet"/></svg></span><small>Capture</small><h3>Google Sheets</h3><ul><li>One order tracker</li><li>Clear status and balance</li><li>Familiar team workflow</li></ul></article>
+      <div class="arrow">→</div>
+      <article class="arch-card core"><span class="icon-box"><svg class="icon"><use href="#i-code"/></svg></span><small>Automate</small><h3>Apps Script</h3><ul><li>Required-field validation</li><li>Create or update logic</li><li>Saved event IDs</li><li>Readable sync results</li></ul></article>
+      <div class="arrow">→</div>
+      <article class="arch-card"><span class="icon-box"><svg class="icon"><use href="#i-calendar"/></svg></span><small>Schedule</small><h3>Google Calendar</h3><ul><li>Pickup and delivery time</li><li>Order summary</li><li>Address and notes</li></ul></article>
+    </div>
+    <div class="handoff">
+      <div class="proof"><b>Code proof</b><code><span>if</span> (status === "confirmed")<br>&nbsp;&nbsp;syncOrderRow_(sheet, row);<br><br>log_(orderId, result, detail);</code></div>
+      <div class="deliverables"><h3>Prototype handoff includes</h3><div class="deliverable-row"><span>Apps Script source</span><span>Sample order CSV</span><span>Setup notes</span><span>Field validation</span><span>Calendar sync</span><span>Sync log</span></div></div>
+    </div>
+    <div class="footer"><span>Self-initiated functional portfolio project</span><strong>Google Sheets · Apps Script · Calendar</strong></div>
+  </section>
+</body>
+</html>
