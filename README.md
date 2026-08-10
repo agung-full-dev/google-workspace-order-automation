@@ -56,3 +56,6 @@ Use a test spreadsheet and calendar first. Review the script before granting per
 
 See [SECURITY.md](SECURITY.md). This repository does not require or include API keys.
 
+## About the Developer
+
+Built by [Agung Pamilu](https://github.com/agung-full-dev), a Full-Stack Web Developer & Automation Specialist. [LinkedIn](https://www.linkedin.com/in/agung-pamilu-704757197/) · [Email](mailto:agungpamilu504@gmail.com)
